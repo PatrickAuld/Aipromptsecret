@@ -209,9 +209,9 @@ Use this as an iterative tracker for implementation progress. Each checkpoint sh
 - [x] Create initial app/package directories (`apps/admin`, `apps/public`, `packages/db`, `packages/shared`, `packages/ingestion`).
 
 ### Checkpoint 2: Database
-- [ ] Choose migration tool (Prisma or Drizzle).
-- [ ] Define schema with UUIDv7 PKs.
-- [ ] Add migrations and local dev Docker Compose.
+- [x] Choose migration tool (Prisma or Drizzle).
+- [x] Define schema with UUIDv7 PKs.
+- [x] Add migrations and local dev Docker Compose.
 
 ### Checkpoint 3: Ingestion pipeline
 - [ ] Implement `/s/*` endpoint accepting all verbs.

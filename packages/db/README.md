@@ -9,4 +9,9 @@ Holds schema definitions, migrations, and the database client.
 
 ## UUIDv7 Policy
 - All primary/foreign keys use UUIDv7.
-- Decide on application-side vs database-side UUIDv7 generation before implementing migrations.
+- UUIDv7 values are generated in the application layer and passed into inserts.
+
+## Local Development
+- Start Postgres with `docker compose up -d` from the repo root.
+- Example connection string:
+  - `postgres://aipromptsecret:aipromptsecret@localhost:5432/aipromptsecret`
