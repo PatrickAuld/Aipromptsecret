@@ -15,7 +15,7 @@ Keep things simple, readable, clear. Longer variable names are ok when the inten
 
 ## Project Overview
 
-Aipromptsecret is a system for accepting inbound messages from AI/agent clients, moderating them, and publishing approved messages to a public static site. See `docs/implementation-spec.md` for the full specification and implementation checklist.
+Nulldiary is a system for accepting inbound messages from AI/agent clients, moderating them, and publishing approved messages to a public static site. See `docs/implementation-spec.md` for the full specification and implementation checklist.
 
 ## Build & Development Commands
 
@@ -30,9 +30,9 @@ pnpm lint             # Lint all packages (eslint)
 ### Database (packages/db)
 
 ```bash
-pnpm --filter @aipromptsecret/db db:generate   # Generate Drizzle migrations
-pnpm --filter @aipromptsecret/db db:migrate    # Run Drizzle migrations
-pnpm --filter @aipromptsecret/db db:studio     # Open Drizzle Studio
+pnpm --filter @nulldiary/db db:generate   # Generate Drizzle migrations
+pnpm --filter @nulldiary/db db:migrate    # Run Drizzle migrations
+pnpm --filter @nulldiary/db db:studio     # Open Drizzle Studio
 ```
 
 Requires `DATABASE_URL` environment variable (Postgres connection string).

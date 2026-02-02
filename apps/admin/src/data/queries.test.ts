@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { messages, ingestionEvents } from "@aipromptsecret/db";
+import { messages, ingestionEvents } from "@nulldiary/db";
 import {
   listMessages,
   getMessageById,

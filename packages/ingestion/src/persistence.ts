@@ -1,4 +1,4 @@
-import { messages, ingestionEvents, type Db } from "@aipromptsecret/db";
+import { messages, ingestionEvents, type Db } from "@nulldiary/db";
 import { uuidv7 } from "uuidv7";
 import type { RawRequest, ParseResult } from "./types.js";
 

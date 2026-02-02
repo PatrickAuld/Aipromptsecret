@@ -1,5 +1,5 @@
 import { eq, desc, sql, and } from "drizzle-orm";
-import { messages, type Db } from "@aipromptsecret/db";
+import { messages, type Db } from "@nulldiary/db";
 
 export async function getApprovedMessages(
   db: Db,

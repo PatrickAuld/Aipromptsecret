@@ -7,7 +7,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-DATABASE_URL="postgres://aipromptsecret:aipromptsecret@localhost:5432/aipromptsecret"
+DATABASE_URL="postgres://nulldiary:nulldiary@localhost:5432/nulldiary"
 export DATABASE_URL
 
 cleanup() {
@@ -20,11 +20,11 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 echo "==> Starting admin app on port 3000..."
-pnpm --filter @aipromptsecret/admin dev &
+pnpm --filter @nulldiary/admin dev &
 admin_pid=$!
 
 echo "==> Starting public site on port 4321..."
-pnpm --filter @aipromptsecret/public dev &
+pnpm --filter @nulldiary/public dev &
 public_pid=$!
 
 echo ""

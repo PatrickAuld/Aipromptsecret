@@ -8,17 +8,23 @@
       "Bash(pnpm:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(pnpm --filter @aipromptsecret/admin test:*)",
+      "Bash(pnpm --filter @nulldiary/admin test:*)",
       "Bash(chmod:*)",
       "Bash(./scripts/dev-up.sh:*)",
       "Bash(curl:*)",
-      "Bash(DATABASE_URL=\"postgres://aipromptsecret:aipromptsecret@localhost:5432/aipromptsecret\" pnpm --filter @aipromptsecret/ingestion dev:*)",
-      "Bash(DATABASE_URL=\"postgres://aipromptsecret:aipromptsecret@localhost:5432/aipromptsecret\" pnpm --filter @aipromptsecret/admin dev:*)",
+      "Bash(DATABASE_URL=\"postgres://nulldiary:nulldiary@localhost:5432/nulldiary\" pnpm --filter @nulldiary/ingestion dev:*)",
+      "Bash(DATABASE_URL=\"postgres://nulldiary:nulldiary@localhost:5432/nulldiary\" pnpm --filter @nulldiary/admin dev:*)",
       "Bash(./scripts/seed.sh:*)",
       "Bash(python3:*)",
       "Bash(./scripts/dev-down.sh:*)",
       "Bash(git status:*)",
-      "Bash(pnpm --filter @aipromptsecret/public test:*)"
+      "Bash(pnpm --filter @nulldiary/public test:*)",
+      "Bash(pnpm --filter @nulldiary/ingestion test)",
+      "Bash(pnpm --filter @nulldiary/public test)",
+      "Bash(git -C /Users/patrick/code/patrickauld/Aipromptsecret status)",
+      "Bash(git -C /Users/patrick/code/patrickauld/Aipromptsecret diff)",
+      "Bash(git -C /Users/patrick/code/patrickauld/Aipromptsecret log --oneline -5)",
+      "Bash(git -C /Users/patrick/code/patrickauld/Aipromptsecret add .claude/settings.local.json CLAUDE.md README.md apps/admin/next.config.mjs apps/admin/package.json apps/admin/src/app/layout.tsx apps/admin/src/components/MessageDetail.tsx apps/admin/src/components/MessageList.tsx apps/admin/src/data/actions.test.ts apps/admin/src/data/actions.ts apps/admin/src/data/queries.test.ts apps/admin/src/data/queries.ts apps/admin/src/lib/db.ts apps/public/package.json apps/public/src/data/queries.ts apps/public/src/lib/db.ts apps/public/src/pages/s/[...path].ts docker-compose.yml package.json packages/db/README.md packages/db/package.json packages/ingestion/package.json packages/ingestion/src/handle-ingestion.ts packages/ingestion/src/persistence.test.ts packages/ingestion/src/persistence.ts pnpm-lock.yaml scripts/dev-reset.sh scripts/dev-services.sh scripts/dev-up.sh)"
     ]
   }
 }

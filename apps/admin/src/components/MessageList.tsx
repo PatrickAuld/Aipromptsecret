@@ -1,4 +1,4 @@
-import type { messages } from "@aipromptsecret/db";
+import type { messages } from "@nulldiary/db";
 
 type Message = typeof messages.$inferSelect;
 

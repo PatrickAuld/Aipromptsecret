@@ -5,9 +5,9 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: aipromptsecret
-      POSTGRES_PASSWORD: aipromptsecret
-      POSTGRES_DB: aipromptsecret
+      POSTGRES_USER: nulldiary
+      POSTGRES_PASSWORD: nulldiary
+      POSTGRES_DB: nulldiary
     ports:
       - "5432:5432"
     volumes:

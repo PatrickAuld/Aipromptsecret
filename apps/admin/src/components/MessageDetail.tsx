@@ -1,4 +1,4 @@
-import type { messages, ingestionEvents } from "@aipromptsecret/db";
+import type { messages, ingestionEvents } from "@nulldiary/db";
 
 type Message = typeof messages.$inferSelect;
 type IngestionEvent = typeof ingestionEvents.$inferSelect;

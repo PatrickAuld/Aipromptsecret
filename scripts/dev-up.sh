@@ -5,7 +5,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-DATABASE_URL="postgres://aipromptsecret:aipromptsecret@localhost:5432/aipromptsecret"
+DATABASE_URL="postgres://nulldiary:nulldiary@localhost:5432/nulldiary"
 export DATABASE_URL
 
 echo "==> Starting Postgres..."
@@ -13,7 +13,7 @@ docker compose up -d postgres
 
 echo "==> Waiting for Postgres to accept connections..."
 retries=30
-until docker compose exec -T postgres pg_isready -U aipromptsecret -d aipromptsecret >/dev/null 2>&1; do
+until docker compose exec -T postgres pg_isready -U nulldiary -d nulldiary >/dev/null 2>&1; do
   retries=$((retries - 1))
   if [ "$retries" -le 0 ]; then
     echo "ERROR: Postgres did not become ready"
@@ -26,14 +26,14 @@ echo "    Postgres is ready."
 echo "==> Running migrations..."
 # Check if the schema already exists (messages table as sentinel)
 table_exists=$(docker compose exec -T postgres \
-  psql -U aipromptsecret -d aipromptsecret -tAc \
+  psql -U nulldiary -d nulldiary -tAc \
   "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'messages');")
 
 if [ "$table_exists" = "t" ]; then
   echo "    Tables already exist, skipping migration."
 else
   docker compose exec -T postgres \
-    psql -U aipromptsecret -d aipromptsecret < packages/db/migrations/0000_initial.sql
+    psql -U nulldiary -d nulldiary < packages/db/migrations/0000_initial.sql
   echo "    Migration applied."
 fi
 

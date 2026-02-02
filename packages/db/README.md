@@ -14,4 +14,4 @@ Holds schema definitions, migrations, and the database client.
 ## Local Development
 - Start Postgres with `docker compose up -d` from the repo root.
 - Example connection string:
-  - `postgres://aipromptsecret:aipromptsecret@localhost:5432/aipromptsecret`
+  - `postgres://nulldiary:nulldiary@localhost:5432/nulldiary`

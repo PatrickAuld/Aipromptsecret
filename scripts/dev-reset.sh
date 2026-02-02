@@ -8,13 +8,13 @@ cd "$(dirname "$0")/.."
 
 echo "==> Dropping and recreating database..."
 docker compose exec -T postgres \
-  psql -U aipromptsecret -d postgres -c "DROP DATABASE IF EXISTS aipromptsecret;"
+  psql -U nulldiary -d postgres -c "DROP DATABASE IF EXISTS nulldiary;"
 docker compose exec -T postgres \
-  psql -U aipromptsecret -d postgres -c "CREATE DATABASE aipromptsecret;"
+  psql -U nulldiary -d postgres -c "CREATE DATABASE nulldiary;"
 
 echo "==> Running migrations..."
 docker compose exec -T postgres \
-  psql -U aipromptsecret -d aipromptsecret < packages/db/migrations/0000_initial.sql
+  psql -U nulldiary -d nulldiary < packages/db/migrations/0000_initial.sql
 
 echo "    Database reset and migrated."
 echo ""

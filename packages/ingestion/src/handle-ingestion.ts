@@ -1,4 +1,4 @@
-import type { Db } from "@aipromptsecret/db";
+import type { Db } from "@nulldiary/db";
 import { extractRequest } from "./extract-request.js";
 import { parseMessage } from "./parse-message.js";
 import { persistIngestion } from "./persistence.js";

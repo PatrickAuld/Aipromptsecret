@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@aipromptsecret/db"],
+  transpilePackages: ["@nulldiary/db"],
   webpack: (config) => {
     // The db package uses .js extensions in TS imports (ESM convention).
     // Tell webpack to also try .ts when resolving .js imports.

@@ -1,4 +1,4 @@
-import { createDb, type Db } from "@aipromptsecret/db";
+import { createDb, type Db } from "@nulldiary/db";
 
 let db: Db | null = null;
 

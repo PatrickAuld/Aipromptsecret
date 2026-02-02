@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { messages, moderationActions, type Db } from "@aipromptsecret/db";
+import { messages, moderationActions, type Db } from "@nulldiary/db";
 import { uuidv7 } from "uuidv7";
 import type { ModerationInput, ModerationResult } from "./types.js";
 

@@ -1,5 +1,5 @@
 {
-  "name": "@aipromptsecret/public",
+  "name": "@nulldiary/public",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,8 +11,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@aipromptsecret/db": "workspace:*",
-    "@aipromptsecret/ingestion": "workspace:*",
+    "@nulldiary/db": "workspace:*",
+    "@nulldiary/ingestion": "workspace:*",
     "@astrojs/node": "^8.0.0",
     "astro": "^4.0.0",
     "drizzle-orm": "^0.30.10"

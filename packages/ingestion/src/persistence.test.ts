@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { messages, ingestionEvents } from "@aipromptsecret/db";
+import { messages, ingestionEvents } from "@nulldiary/db";
 import { persistIngestion } from "./persistence.js";
 import type { RawRequest, ParseResult } from "./types.js";
 

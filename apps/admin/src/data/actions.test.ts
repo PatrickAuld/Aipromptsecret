@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { messages, moderationActions } from "@aipromptsecret/db";
+import { messages, moderationActions } from "@nulldiary/db";
 import { approveMessage, denyMessage } from "./actions.js";
 
 const { mockUuidv7 } = vi.hoisted(() => ({
