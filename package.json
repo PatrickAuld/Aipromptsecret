@@ -8,6 +8,11 @@
   ],
   "scripts": {
     "format": "prettier --check .",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "dev:up": "./scripts/dev-up.sh",
+    "dev:services": "./scripts/dev-services.sh",
+    "dev:seed": "./scripts/seed.sh",
+    "dev:down": "./scripts/dev-down.sh",
+    "dev:reset": "./scripts/dev-reset.sh"
   }
 }
