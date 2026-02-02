@@ -219,9 +219,9 @@ Use this as an iterative tracker for implementation progress. Each checkpoint sh
 - [x] Persist raw events and pending messages.
 
 ### Checkpoint 4: Admin moderation UI
-- [ ] Scaffold admin app pages.
-- [ ] Implement list/detail views with filters.
-- [ ] Add approve/deny actions with audit trail.
+- [x] Scaffold admin app pages.
+- [x] Implement list/detail views with filters.
+- [x] Add approve/deny actions with audit trail.
 
 ### Checkpoint 5: Public static site
 - [ ] Scaffold public app pages.

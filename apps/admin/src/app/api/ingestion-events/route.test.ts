@@ -1,0 +1,44 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+const mockGetIngestionEvents = vi.fn();
+
+vi.mock("@/data/queries", () => ({
+  getIngestionEventsByMessageId: (...args: unknown[]) =>
+    mockGetIngestionEvents(...args),
+}));
+
+vi.mock("@/lib/db", () => ({
+  getDb: () => "fake-db",
+}));
+
+const { GET } = await import("./route.js");
+
+beforeEach(() => {
+  mockGetIngestionEvents.mockReset();
+});
+
+describe("GET /api/ingestion-events", () => {
+  it("returns events for a messageId", async () => {
+    const events = [{ id: "evt-1" }, { id: "evt-2" }];
+    mockGetIngestionEvents.mockResolvedValue(events);
+
+    const req = new Request(
+      "http://localhost/api/ingestion-events?messageId=msg-1",
+    );
+    const res = await GET(req);
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body).toEqual({ events });
+    expect(mockGetIngestionEvents).toHaveBeenCalledWith("fake-db", "msg-1");
+  });
+
+  it("returns 400 when messageId is missing", async () => {
+    const req = new Request("http://localhost/api/ingestion-events");
+    const res = await GET(req);
+
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toBeDefined();
+  });
+});
