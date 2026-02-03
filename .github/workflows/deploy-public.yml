@@ -24,6 +24,9 @@ jobs:
           node-version: "20"
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @nulldiary/db db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - run: pnpm --filter @nulldiary/public build
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
