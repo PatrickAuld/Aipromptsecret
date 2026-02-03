@@ -14,8 +14,7 @@
     "@nulldiary/db": "workspace:*",
     "@nulldiary/ingestion": "workspace:*",
     "@astrojs/cloudflare": "^11.0.0",
-    "astro": "^4.0.0",
-    "drizzle-orm": "^0.30.10"
+    "astro": "^4.0.0"
   },
   "devDependencies": {
     "typescript": "^5.4.5",

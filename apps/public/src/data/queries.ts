@@ -1,5 +1,4 @@
-import { eq, desc, sql, and } from "drizzle-orm";
-import { messages, type Db } from "@nulldiary/db";
+import { eq, desc, sql, and, messages, type Db } from "@nulldiary/db";
 
 export async function getApprovedMessages(
   db: Db,
