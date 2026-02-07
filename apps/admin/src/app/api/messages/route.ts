@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { listMessages } from "@/data/queries";
 
+export const runtime = "edge";
+
 const VALID_STATUSES = new Set(["pending", "approved", "denied"]);
 
 export async function GET(req: Request): Promise<Response> {

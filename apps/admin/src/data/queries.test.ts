@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { messages, ingestionEvents } from "@nulldiary/db";
 import {
   listMessages,
   getMessageById,

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { denyMessage } from "@/data/actions";
 
+export const runtime = "edge";
+
 export async function POST(req: Request): Promise<Response> {
   const body = await req.json();
   const { messageId, actor, reason } = body;

@@ -9,10 +9,19 @@
   "scripts": {
     "format": "prettier --check .",
     "lint": "eslint .",
+    "build": "pnpm --filter @nulldiary/public build && pnpm --filter @nulldiary/admin build",
+    "build:admin:cf": "pnpm --filter @nulldiary/admin build && cd apps/admin && pnpm exec next-on-pages",
+    "test": "pnpm --filter @nulldiary/ingestion test && pnpm --filter @nulldiary/admin test && pnpm --filter @nulldiary/public test",
     "dev:up": "./scripts/dev-up.sh",
     "dev:services": "./scripts/dev-services.sh",
     "dev:seed": "./scripts/seed.sh",
     "dev:down": "./scripts/dev-down.sh",
     "dev:reset": "./scripts/dev-reset.sh"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.0",
+    "eslint": "^9.39.0",
+    "@eslint/js": "^9.39.0",
+    "typescript-eslint": "^8.54.0"
   }
 }

@@ -27,7 +27,7 @@ jobs:
       - run: pnpm --filter @nulldiary/db db:migrate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      - run: pnpm --filter @nulldiary/admin build && cd apps/admin && npx @cloudflare/next-on-pages
+      - run: pnpm --filter @nulldiary/admin build && cd apps/admin && pnpm exec next-on-pages
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - uses: cloudflare/wrangler-action@v3
