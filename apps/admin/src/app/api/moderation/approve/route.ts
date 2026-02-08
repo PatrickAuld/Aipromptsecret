@@ -1,12 +1,22 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { approveMessage } from "@/data/actions";
+import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "edge";
 
 export async function POST(req: Request): Promise<Response> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await req.json();
-  const { messageId, actor, reason } = body;
+  const { messageId, reason } = body;
 
   if (!messageId || typeof messageId !== "string") {
     return NextResponse.json(
@@ -15,13 +25,7 @@ export async function POST(req: Request): Promise<Response> {
     );
   }
 
-  if (!actor || typeof actor !== "string") {
-    return NextResponse.json(
-      { error: "actor is required" },
-      { status: 400 },
-    );
-  }
-
+  const actor = user.email || user.id;
   const result = await approveMessage(getDb(), { messageId, actor, reason });
 
   if (!result.ok) {

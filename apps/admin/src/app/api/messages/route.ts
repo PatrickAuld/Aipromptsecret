@@ -1,12 +1,22 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { listMessages } from "@/data/queries";
+import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "edge";
 
 const VALID_STATUSES = new Set(["pending", "approved", "denied"]);
 
 export async function GET(req: Request): Promise<Response> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const url = new URL(req.url);
   const status = url.searchParams.get("status") ?? "pending";
   const search = url.searchParams.get("search") ?? undefined;

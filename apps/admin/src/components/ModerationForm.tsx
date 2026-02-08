@@ -4,17 +4,10 @@ import { useState } from "react";
 
 export function ModerationForm({ messageId }: { messageId: string }) {
   const [reason, setReason] = useState("");
-  const [actor, setActor] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
   async function handleAction(action: "approve" | "deny") {
-    if (!actor.trim()) {
-      setErrorMessage("Actor name is required");
-      setStatus("error");
-      return;
-    }
-
     setStatus("loading");
     setErrorMessage("");
 
@@ -23,7 +16,6 @@ export function ModerationForm({ messageId }: { messageId: string }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         messageId,
-        actor: actor.trim(),
         reason: reason.trim() || undefined,
       }),
     });
@@ -41,17 +33,6 @@ export function ModerationForm({ messageId }: { messageId: string }) {
   return (
     <div className="detail-section">
       <h2>Moderate</h2>
-      <div style={{ marginBottom: "0.5rem" }}>
-        <label htmlFor="actor">Actor</label>
-        <input
-          id="actor"
-          type="text"
-          value={actor}
-          onChange={(e) => setActor(e.target.value)}
-          placeholder="your-name"
-          style={{ width: "20rem" }}
-        />
-      </div>
       <div style={{ marginBottom: "0.5rem" }}>
         <label htmlFor="reason">Reason (optional)</label>
         <textarea

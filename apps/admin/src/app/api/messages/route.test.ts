@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockListMessages = vi.fn();
+const mockGetUser = vi.fn();
 
 vi.mock("@/data/queries", () => ({
   listMessages: (...args: unknown[]) => mockListMessages(...args),
@@ -10,13 +11,34 @@ vi.mock("@/lib/db", () => ({
   getDb: () => "fake-db",
 }));
 
+vi.mock("@/lib/supabase/server", () => ({
+  createClient: async () => ({
+    auth: { getUser: mockGetUser },
+  }),
+}));
+
 const { GET } = await import("./route.js");
+
+const fakeUser = { id: "user-1", email: "admin@test.com" };
 
 beforeEach(() => {
   mockListMessages.mockReset();
+  mockGetUser.mockReset();
+  mockGetUser.mockResolvedValue({ data: { user: fakeUser } });
 });
 
 describe("GET /api/messages", () => {
+  it("returns 401 when not authenticated", async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null } });
+
+    const req = new Request("http://localhost/api/messages");
+    const res = await GET(req);
+
+    expect(res.status).toBe(401);
+    const body = await res.json();
+    expect(body.error).toBe("Unauthorized");
+  });
+
   it("returns messages with default filters", async () => {
     mockListMessages.mockResolvedValue({ messages: [], total: 0 });
 

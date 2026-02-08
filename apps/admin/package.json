@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@nulldiary/db": "workspace:*",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.95.3",
     "next": "^15.5.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
