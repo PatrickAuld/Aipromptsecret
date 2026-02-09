@@ -67,8 +67,8 @@ Local `DATABASE_URL`: `postgres://nulldiary:nulldiary@localhost:5432/nulldiary`
 
 pnpm workspace with two apps and three packages:
 
-- **`apps/public`** -- Astro 4 SSR site (Cloudflare adapter). Serves approved messages and the ingestion endpoint (`/s/*`).
-- **`apps/admin`** -- Next.js 14 admin moderation UI (Edge runtime, Cloudflare Pages via `@cloudflare/next-on-pages`).
+- **`apps/public`** -- Next.js 15 SSR site (Cloudflare Pages via `@cloudflare/next-on-pages`). Serves approved messages and the ingestion endpoint (`/s/*`).
+- **`apps/admin`** -- Next.js 15 admin moderation UI (Cloudflare Pages via `@cloudflare/next-on-pages`). Auth via Supabase; bypass with `SUPABASE_AUTH_BYPASS=true` for local dev.
 - **`packages/db`** -- Drizzle ORM schema, postgres.js client factory, and migration runner.
 - **`packages/ingestion`** -- Pure-logic ingestion service: request parsing and normalization. No HTTP framework coupling.
 - **`packages/shared`** -- Placeholder for shared types/Zod schemas (currently empty).
@@ -91,7 +91,7 @@ packages/db    → (no internal deps)
 
 ### Ingestion Pipeline
 
-The ingestion endpoint (`/s/*` in `apps/public/src/pages/s/[...path].ts`) accepts all HTTP verbs. Flow:
+The ingestion endpoint (`/s/*` in `apps/public/src/app/s/[...path]/route.ts`) accepts all HTTP verbs. Flow:
 
 1. `extractRequest(Request)` → `RawRequest` (normalize URL, headers, body)
 2. `parseMessage(RawRequest)` → `ParseResult` (extract message by priority)
@@ -110,7 +110,7 @@ On success: inserts into `messages` first (UUIDv7 id), then `ingestion_events` w
 
 - **Data layer** in `apps/admin/src/data/`: `queries.ts` (list/get) and `actions.ts` (approve/deny).
 - **Moderation actions** are transactional: select-for-update, validate pending status, update message, insert audit row, commit.
-- **API routes** at `apps/admin/src/app/api/` all use `export const runtime = "edge"`.
+- **API routes** at `apps/admin/src/app/api/`. No `export const runtime = "edge"` — `next-on-pages` handles edge routing for Cloudflare builds.
 - **DB singleton**: `apps/admin/src/lib/db.ts` exports `getDb()` that lazily creates client from `DATABASE_URL`.
 
 ### Deployment

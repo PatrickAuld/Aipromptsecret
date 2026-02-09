@@ -30,8 +30,9 @@ jobs:
       - run: pnpm --filter @nulldiary/public build
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - run: cd apps/public && pnpm exec next-on-pages
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/public/dist --project-name=nulldiary-public
+          command: pages deploy apps/public/.vercel/output/static --project-name=nulldiary-public

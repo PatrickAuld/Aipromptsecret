@@ -2,8 +2,6 @@ import type { ReactNode } from "react";
 import { UserNav } from "@/components/UserNav";
 import "./globals.css";
 
-export const runtime = "edge";
-
 export const metadata = {
   title: "Admin - Nulldiary",
 };

@@ -10,6 +10,9 @@ cd "$(dirname "$0")/.."
 DATABASE_URL="postgres://nulldiary:nulldiary@localhost:5432/nulldiary"
 export DATABASE_URL
 
+SUPABASE_AUTH_BYPASS=true
+export SUPABASE_AUTH_BYPASS
+
 cleanup() {
   echo ""
   echo "==> Stopping services..."

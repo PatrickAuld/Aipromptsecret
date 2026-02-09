@@ -4,8 +4,6 @@ import { getMessageById, getIngestionEventsByMessageId } from "@/data/queries";
 import { MessageDetail } from "@/components/MessageDetail";
 import { ModerationForm } from "@/components/ModerationForm";
 
-export const runtime = "edge";
-
 export default async function MessageDetailPage({
   params,
 }: {

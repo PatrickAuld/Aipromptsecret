@@ -3,10 +3,11 @@ import { getDb } from "@/lib/db";
 import { approveMessage } from "@/data/actions";
 import { createClient } from "@/lib/supabase/server";
 
-export const runtime = "edge";
-
 export async function POST(req: Request): Promise<Response> {
   const supabase = await createClient();
+  if (!supabase) {
+    return NextResponse.json({ error: "Auth not configured" }, { status: 500 });
+  }
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -8,10 +8,15 @@ export function UserNav() {
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setEmail(user?.email ?? null);
-    });
+    try {
+      const supabase = createClient();
+      if (!supabase) return;
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        setEmail(user?.email ?? null);
+      });
+    } catch {
+      // Supabase not configured — skip user nav
+    }
   }, []);
 
   if (!email) return null;

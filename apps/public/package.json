@@ -4,19 +4,24 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "wrangler pages dev ./dist",
+    "dev": "next dev --port 4321",
+    "build": "next build",
+    "preview": "wrangler pages dev .vercel/output/static",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
     "@nulldiary/db": "workspace:*",
     "@nulldiary/ingestion": "workspace:*",
-    "@astrojs/cloudflare": "^12.6.0",
-    "astro": "^5.17.0"
+    "next": "^15.5.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.0",
+    "@types/node": "25.2.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "typescript": "^5.9.0",
     "vitest": "^4.0.0"
   }

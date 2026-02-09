@@ -2,8 +2,6 @@ import { getDb } from "@/lib/db";
 import { listMessages } from "@/data/queries";
 import { MessageList } from "@/components/MessageList";
 
-export const runtime = "edge";
-
 interface SearchParams {
   status?: string;
   search?: string;
