@@ -19,9 +19,9 @@ export function TagsForm({
 }) {
   const initialText = useMemo(() => initialTags.join(", "), [initialTags]);
   const [text, setText] = useState(initialText);
-  const [status, setStatus] = useState<
-    "idle" | "saving" | "success" | "error"
-  >("idle");
+  const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">(
+    "idle",
+  );
   const [error, setError] = useState<string>("");
 
   const tags = useMemo(() => normalizeTags(text), [text]);
@@ -63,11 +63,7 @@ export function TagsForm({
 
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
         <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <input
-            type="checkbox"
-            checked={featured}
-            onChange={toggleFeatured}
-          />
+          <input type="checkbox" checked={featured} onChange={toggleFeatured} />
           Featured (public gallery)
         </label>
 

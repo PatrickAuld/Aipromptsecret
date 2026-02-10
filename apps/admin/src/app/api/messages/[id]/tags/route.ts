@@ -41,13 +41,14 @@ export async function POST(
   // Normalize tags: trim, lowercase, unique, remove empties.
   const normalized = Array.from(
     new Set(
-      tags
-        .map((t) => t.trim().toLowerCase())
-        .filter((t) => t.length > 0),
+      tags.map((t) => t.trim().toLowerCase()).filter((t) => t.length > 0),
     ),
   );
 
-  const result = await setMessageTags(getDb(), { messageId: id, tags: normalized });
+  const result = await setMessageTags(getDb(), {
+    messageId: id,
+    tags: normalized,
+  });
   if (!result.ok) {
     const status = result.error === "Message not found" ? 404 : 400;
     return NextResponse.json({ error: result.error }, { status });

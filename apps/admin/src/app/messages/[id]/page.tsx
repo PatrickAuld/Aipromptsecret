@@ -18,7 +18,7 @@ export default async function MessageDetailPage({
     notFound();
   }
 
-  let events = [];
+  let events: Awaited<ReturnType<typeof getIngestionEventsByMessageId>> = [];
   try {
     events = await getIngestionEventsByMessageId(db, id);
   } catch {
