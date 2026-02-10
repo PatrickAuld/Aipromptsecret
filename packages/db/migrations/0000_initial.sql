@@ -1,8 +1,19 @@
-CREATE TYPE "parse_status" AS ENUM ('success', 'partial', 'failed');
-CREATE TYPE "moderation_status" AS ENUM ('pending', 'approved', 'denied');
-CREATE TYPE "moderation_action" AS ENUM ('approved', 'denied');
+DO $$ BEGIN
+  CREATE TYPE "parse_status" AS ENUM ('success', 'partial', 'failed');
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
 
-CREATE TABLE "messages" (
+DO $$ BEGIN
+  CREATE TYPE "moderation_status" AS ENUM ('pending', 'approved', 'denied');
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE "moderation_action" AS ENUM ('approved', 'denied');
+EXCEPTION WHEN duplicate_object THEN null;
+END $$;
+
+CREATE TABLE IF NOT EXISTS "messages" (
   "id" uuid PRIMARY KEY,
   "content" text NOT NULL,
   "metadata" jsonb NOT NULL,
@@ -14,7 +25,7 @@ CREATE TABLE "messages" (
   "tags" text[]
 );
 
-CREATE TABLE "ingestion_events" (
+CREATE TABLE IF NOT EXISTS "ingestion_events" (
   "id" uuid PRIMARY KEY,
   "received_at" timestamptz NOT NULL DEFAULT now(),
   "method" text NOT NULL,
@@ -30,7 +41,7 @@ CREATE TABLE "ingestion_events" (
   "message_id" uuid REFERENCES "messages"("id")
 );
 
-CREATE TABLE "moderation_actions" (
+CREATE TABLE IF NOT EXISTS "moderation_actions" (
   "id" uuid PRIMARY KEY,
   "message_id" uuid NOT NULL REFERENCES "messages"("id"),
   "action" "moderation_action" NOT NULL,
@@ -39,6 +50,6 @@ CREATE TABLE "moderation_actions" (
   "created_at" timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE INDEX "ingestion_events_received_at_idx" ON "ingestion_events" ("received_at");
-CREATE INDEX "messages_moderation_status_created_at_idx" ON "messages" ("moderation_status", "created_at");
-CREATE INDEX "messages_content_search_idx" ON "messages" USING GIN (to_tsvector('english', "content"));
+CREATE INDEX IF NOT EXISTS "ingestion_events_received_at_idx" ON "ingestion_events" ("received_at");
+CREATE INDEX IF NOT EXISTS "messages_moderation_status_created_at_idx" ON "messages" ("moderation_status", "created_at");
+CREATE INDEX IF NOT EXISTS "messages_content_search_idx" ON "messages" USING GIN (to_tsvector('english', "content"));
