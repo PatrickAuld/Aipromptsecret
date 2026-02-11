@@ -1,4 +1,5 @@
 import type { messages } from "@nulldiary/db";
+import { MessageRowActions } from "./MessageRowActions";
 
 type Message = typeof messages.$inferSelect;
 
@@ -14,7 +15,7 @@ export function MessageList({ messages }: { messages: Message[] }) {
           <th>Content</th>
           <th>Status</th>
           <th>Created</th>
-          <th>Action</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -32,7 +33,11 @@ export function MessageList({ messages }: { messages: Message[] }) {
             </td>
             <td>{new Date(msg.createdAt).toLocaleString()}</td>
             <td>
-              <a href={`/messages/${msg.id}`}>View</a>
+              <MessageRowActions
+                messageId={msg.id}
+                status={msg.moderationStatus}
+                tags={msg.tags}
+              />
             </td>
           </tr>
         ))}
