@@ -24,7 +24,8 @@ export function MessageRowActions({
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
       if (!rootRef.current) return;
-      if (e.target instanceof Node && rootRef.current.contains(e.target)) return;
+      if (e.target instanceof Node && rootRef.current.contains(e.target))
+        return;
       setOpen(false);
     }
     if (!open) return;
