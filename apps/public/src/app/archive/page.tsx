@@ -61,7 +61,7 @@ export default async function ArchivePage({
               <span className="secret-number">
                 No. {String(total - offset - i).padStart(3, "0")}
               </span>
-              {msg.approvedAt && <time>{formatDate(msg.approvedAt)}</time>}
+              {msg.approved_at && <time>{formatDate(msg.approved_at)}</time>}
             </div>
           </a>
         ))
