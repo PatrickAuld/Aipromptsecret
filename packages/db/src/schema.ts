@@ -73,3 +73,12 @@ export const moderationActions = pgTable("moderation_actions", {
     .defaultNow()
     .notNull(),
 });
+
+export const adminUsers = pgTable("admin_users", {
+  id: uuid("id").primaryKey(),
+  userId: uuid("user_id").notNull().unique(),
+  email: text("email"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
