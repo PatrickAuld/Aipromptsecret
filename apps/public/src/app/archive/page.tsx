@@ -53,7 +53,7 @@ export default async function ArchivePage({
         messages.map((msg, i) => (
           <a
             key={msg.id}
-            href={`/messages/${msg.id}`}
+            href={msg.short_id ? `/m/${msg.short_id}` : `/messages/${msg.id}`}
             className="secret-item"
             data-size={secretSize(msg.edited_content ?? msg.content)}
           >

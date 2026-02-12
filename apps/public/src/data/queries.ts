@@ -52,6 +52,23 @@ async function _getApprovedMessageById(
   return data as Message;
 }
 
+async function _getApprovedMessageByShortId(
+  db: Db,
+  shortId: string,
+): Promise<Message | null> {
+  const { data, error } = await db
+    .from("messages")
+    .select("*")
+    .eq("short_id", shortId)
+    .eq("moderation_status", "approved")
+    .single();
+
+  if (error && error.code === "PGRST116") return null;
+  if (error) throw error;
+
+  return data as Message;
+}
+
 /**
  * Uncached query helpers (useful for tests and any callers that already have a
  * Db instance).
@@ -89,6 +106,14 @@ export const getApprovedMessageByIdCached = unstable_cache(
     return _getApprovedMessageById(getDb(), id);
   },
   ["public:getApprovedMessageById"],
+  { revalidate: PUBLIC_REVALIDATE_SECONDS },
+);
+
+export const getApprovedMessageByShortIdCached = unstable_cache(
+  async (shortId: string) => {
+    return _getApprovedMessageByShortId(getDb(), shortId);
+  },
+  ["public:getApprovedMessageByShortId"],
   { revalidate: PUBLIC_REVALIDATE_SECONDS },
 );
 

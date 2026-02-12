@@ -22,6 +22,13 @@
       "when": 1770867600000,
       "tag": "0002_featured_sets",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1770873660000,
+      "tag": "0003_short_ids",
+      "breakpoints": true
     }
   ]
 }

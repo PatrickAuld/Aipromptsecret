@@ -42,6 +42,7 @@ export const messages = pgTable("messages", {
     .notNull(),
   moderatedBy: text("moderated_by"),
   tags: text("tags").array(),
+  shortId: text("short_id"),
 });
 
 export const ingestionEvents = pgTable("ingestion_events", {

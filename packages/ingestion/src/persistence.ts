@@ -1,5 +1,6 @@
 import type { Db } from "@nulldiary/db";
 import { uuidv7 } from "uuidv7";
+import { randomShortId } from "./short-id.js";
 import type { RawRequest, ParseResult } from "./types.js";
 
 export async function persistIngestion(
@@ -11,13 +12,31 @@ export async function persistIngestion(
 
   if (parsed.status === "success") {
     messageId = uuidv7();
-    const { error } = await db.from("messages").insert({
-      id: messageId,
-      content: parsed.message,
-      metadata: {},
-      moderation_status: "pending",
-    });
-    if (error) throw error;
+
+    // Generate a short, shareable ID for public URLs.
+    // Retry a few times on the extremely unlikely chance of collision.
+    let inserted = false;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const { error } = await db.from("messages").insert({
+        id: messageId,
+        content: parsed.message,
+        metadata: {},
+        moderation_status: "pending",
+        short_id: randomShortId(),
+      });
+
+      if (!error) {
+        inserted = true;
+        break;
+      }
+      // Postgres unique violation
+      if ((error as any).code === "23505") continue;
+      throw error;
+    }
+
+    if (!inserted) {
+      throw new Error("Failed to generate unique short_id for message");
+    }
   }
 
   const { error } = await db.from("ingestion_events").insert({

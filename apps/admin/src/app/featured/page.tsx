@@ -1,6 +1,8 @@
 import { getDb } from "@/lib/db";
 import { uuidv7 } from "uuidv7";
 
+export const dynamic = "force-dynamic";
+
 export default async function FeaturedSetsPage() {
   const db = getDb();
 

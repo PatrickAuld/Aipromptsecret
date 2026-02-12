@@ -9,6 +9,7 @@ export interface Message {
   moderation_status: "pending" | "approved" | "denied";
   moderated_by: string | null;
   tags: string[] | null;
+  short_id: string | null;
 }
 
 export interface IngestionEvent {
