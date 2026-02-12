@@ -1,266 +1,242 @@
-# Proposal: Categorization + similarity clustering for NullDiary
+# Working plan: Categorization + similarity clustering (pgvector) for NullDiary
+
+> This is a living document. We will update it as we implement features across many PRs.
 
 ## Problem
 
-NullDiary can receive many messages that are identical or very similar (e.g., multiple LLMs producing the same “confession”). Moderation time scales poorly when duplicates flood the queue.
+NullDiary can receive many messages that are identical or very similar (e.g., multiple LLMs generating the same confession). Moderation time scales poorly when duplicates flood the queue.
 
-**Goal:** if there are many similar messages, moderators should be able to approve/deny **once** for the group, with a single “representative” message shown publicly (or a group denied).
+## Product goals
 
-## Desired outcomes
+- Automatically group similar messages together.
+- Moderation happens on **clusters** with a single **representative** (canonical) message.
+- The public site shows **only** representatives that are **approved and curated/edited by a moderator**.
+- A single moderation action (approve/deny) should apply to all members of the cluster.
 
-- Automatically group similar messages together (clusters).
-- Show clusters in admin (“30 similar messages”) with a representative.
-- A moderation action on the representative can apply to the entire cluster.
-- Support multiple strategies from simple (cheap) to advanced (LLM-assisted).
-- Preserve auditability: why were messages grouped? which rule/score? when?
+## Non-goals (for now)
+
+- No “LLM adjudication” stage (we are **ignoring Stage 4**).
+- No complex merge/split UI at first (we can add later if needed).
 
 ## Definitions
 
-- **Canonical / representative**: one message chosen to represent a cluster.
+- **Representative / canonical**: the one message shown publicly for a cluster.
 - **Cluster**: a set of message IDs considered duplicates or near-duplicates.
-- **Similarity score**: numeric measure that can drive clustering decisions.
+- **Similarity score**: numeric measure that drives clustering decisions.
 
 ---
 
-## Pipeline overview (multi-stage, cost-aware)
+## Chosen strategy
 
-The best approach is a staged pipeline:
+We are going with:
 
-1. **Normalization** (always)
-2. **Exact match / strong heuristics** (cheap)
-3. **Near-duplicate matching** via embeddings / MinHash (moderate)
-4. **Optional LLM adjudication** for borderline cases (expensive)
+- **Stage 1**: normalization + hashing
+- **Stage 2**: exact match / cheap heuristics
+- **Stage 3 (Option A)**: **embeddings + Postgres + pgvector** similarity search
+- **Stage 3 is synchronous** in the ingestion pipeline
 
-This structure gives us a fast path for obvious duplicates and a robust path for tricky paraphrases.
-
----
-
-## Stage 1: Normalization (always)
-
-Create a normalized form of the message for matching:
-
-- Trim whitespace
-- Collapse repeated whitespace to single spaces
-- Normalize unicode (NFKC)
-- Lowercase (optional; language dependent)
-- Strip leading/trailing punctuation (optional)
-
-Store:
-
-- `normalized_content` (string)
-- `normalized_hash` (sha256 of normalized string)
-
-**Why:** enables exact-dedup even when the raw strings differ slightly.
+Rationale: simplest architecture (one DB) and the best coverage for paraphrases.
 
 ---
 
-## Stage 2: Exact / heuristic matching (cheap)
+## Data model (proposed)
 
-### 2.1 Exact dedup
+We want clustering to be explicit and auditable.
 
-- If `normalized_hash` matches an existing message hash → same cluster.
-
-### 2.2 Template/boilerplate detection
-
-Many LLMs emit boilerplate wrappers.
-
-- Maintain a small list of common prefixes/suffixes to strip (config-driven).
-- After stripping, recompute normalized hash.
-
-### 2.3 N-gram / token overlap threshold
-
-For short messages or obvious near-copies:
-
-- Tokenize words
-- Compute Jaccard similarity on word sets
-- If above high threshold (e.g., 0.9) → same cluster
-
-**Pros:** very cheap.
-**Cons:** misses paraphrases.
-
----
-
-## Stage 3: Near-duplicate clustering (robust)
-
-Two viable approaches:
-
-### Option A: Embeddings + vector similarity (recommended for paraphrases)
-
-- Generate an embedding vector for `normalized_content`.
-- Search for nearest neighbors in a vector index.
-- If cosine similarity > threshold (tune; e.g., 0.88–0.94), link to that cluster.
-
-**Index choices:**
-
-- Postgres pgvector (simple deployment, good enough at this scale)
-- External vector DB (Pinecone, etc.) if needed later
-
-**Pros:** catches paraphrases, language variation.
-**Cons:** requires embedding generation + vector storage.
-
-### Option B: MinHash + LSH (recommended for “almost identical” text)
-
-- Compute MinHash signature over shingles (e.g., 5-grams).
-- Use LSH buckets to find likely near-duplicates.
-
-**Pros:** cheap-ish, good for near-copies.
-**Cons:** weaker for paraphrases.
-
----
-
-## Stage 4: Optional LLM adjudication (expensive, selective)
-
-Use LLM calls only when:
-
-- Similarity is in a gray band (e.g., 0.80–0.88)
-- Or cluster assignment is ambiguous (two plausible clusters)
-
-Prompt the model with:
-
-- candidate message A (new)
-- candidate representative(s)
-- ask for: “same underlying confession?” yes/no + confidence
-
-Store:
-
-- decision
-- model name/version
-- confidence
-- reasoning (short, optional)
-
-**Guardrails:**
-
-- Hard cap cost per hour/day
-- Prefer smaller/cheaper models
-- Batch adjudication jobs
-
----
-
-## Data model proposal
-
-Introduce explicit cluster tables (even if we start simple).
-
-### Tables
-
-#### `message_clusters`
+### `message_clusters`
 
 - `id` (uuid)
 - `representative_message_id` (uuid)
 - `status` enum: `pending` | `approved` | `denied`
 - `created_at`, `updated_at`
-- `strategy` (text) – how this cluster was formed (e.g., `hash`, `embedding`, `llm`)
-- `similarity_threshold` (float)
+- `strategy` text: `hash` | `embedding`
+- `threshold` float
 
-#### `message_cluster_members`
+### `message_cluster_members`
 
 - `id` (uuid)
 - `cluster_id` (uuid)
 - `message_id` (uuid)
-- `score` (float, nullable)
+- `score` float (nullable)
 - `created_at`
 
-#### (optional) `message_embeddings`
+### `message_embeddings`
 
 - `message_id` (uuid)
 - `embedding` (vector)
 - `model` (text)
 - `created_at`
 
-### On the `messages` table
+### On `messages`
 
-- Add `cluster_id` (uuid, nullable) for easy joins.
+We will need fields to support:
 
----
+- clustering
+- “public only shows curated representatives”
 
-## Admin UX proposal
+Proposed fields:
 
-### Queue view changes
+- `cluster_id` (uuid, nullable)
+- `is_representative` (boolean) OR infer representative via `message_clusters.representative_message_id`
+- `public_content` (text, nullable) — the moderator-curated/edited content that is safe for public display
+  - public render uses `public_content` only
+  - if `public_content` is null, the message should not show publicly even if approved
 
-- Primary queue becomes **clusters**, not individual messages.
-- Each row shows:
-  - Representative content
-  - Count of members (e.g., “23 similar”)
-  - Strategy badge (hash/embedding/llm)
-  - Timestamp range (first seen → last seen)
-
-### Cluster detail view
-
-- Representative message
-- List of members (collapsed by default)
-- Ability to:
-  - Approve/Deny cluster
-  - Change representative
-  - Split cluster (select members → new cluster)
-  - Merge clusters
-
-### Moderation semantics
-
-- Approving cluster sets:
-  - representative message → approved
-  - optionally set other members to `denied` (or `approved` but hidden)
-- Denying cluster sets:
-  - all members → denied
-
-Recommended:
-
-- Only representative becomes publicly visible.
-- Non-representatives become `denied` with a reason like “duplicate of <id>”.
+> Note: today we already have `edited_content`. We can either rename semantics or introduce `public_content` to make the intent unambiguous.
 
 ---
 
-## Operational approach
+## Ingestion-time pipeline (synchronous)
 
-### When to cluster
+### Inputs
 
-Two modes:
+- Raw message text
 
-1. **On ingestion (sync-ish):**
-   - Run Stage 1 + Stage 2 immediately
-   - Optionally enqueue Stage 3 as background job
+### Output
 
-2. **Batch job (async):**
-   - Periodically scan pending messages
-   - Build/refresh clusters
+- A newly inserted message row (pending)
+- A cluster assignment (existing cluster or a new one)
+- An embedding row (for non-trivial messages)
 
-Given throughput uncertainty, start with **batch job** + a light ingestion-time exact hash match.
+### Step-by-step
 
-### Rebuilding clusters
+1. **Normalize** message text (trim, collapse whitespace, unicode NFKC, etc.).
+2. Compute `normalized_hash`.
+3. **Exact dedup**:
+   - Look up an existing message with same `normalized_hash`.
+   - If found, attach to that message’s cluster (or create cluster if missing).
+4. **Embedding (pgvector)**:
+   - If no exact match, generate an embedding for normalized text.
+   - Query for nearest neighbors in `message_embeddings` using pgvector.
+   - If top match similarity >= threshold → attach to that cluster.
+   - Else create a new cluster with this message as representative.
+5. Persist:
+   - insert `messages` (pending)
+   - insert `message_embeddings`
+   - insert/update cluster + membership
 
-- Cluster logic will evolve.
-- Keep raw messages immutable and recompute cluster assignments when needed.
+### Keeping it cheap + minimal
+
+- Use one embeddings provider/model (e.g. OpenAI small embedding model) and store the model name.
+- Do embeddings only when message length > a minimum threshold.
+- Add a conservative similarity threshold to reduce false positives.
+- Prefer _one_ DB roundtrip pattern:
+  - insert message
+  - compute embedding
+  - nearest-neighbor query
+  - cluster assignment
 
 ---
 
-## Rollout plan (incremental)
+## How to run synchronous embeddings on Vercel (minimal plan)
 
-1. **Phase 1 (1–2 days):**
-   - Add normalization + normalized hash
-   - Exact dedup clustering
-   - Admin: show “duplicate count” on message
-   - Bulk deny duplicates (one-click)
+We want a solution that works with serverless constraints but stays simple.
 
-2. **Phase 2 (2–4 days):**
-   - Add embeddings table + pgvector
-   - Similarity search + cluster assignment
-   - Admin: cluster list view
+### Preferred approach: synchronous inside the ingestion route (no queue)
 
-3. **Phase 3 (optional):**
-   - Add LLM adjudication for gray band
-   - Add cluster merge/split tooling
+- Implement embedding generation + pgvector search **inside** the ingestion handler.
+- If embedding provider call fails or times out:
+  - still insert the message as `pending`
+  - mark it as “unclustered”
+  - a later backfill job can compute embedding
+
+This is minimal infra: only Supabase Postgres + an embedding API.
+
+### Simple reliability backstop: Vercel Cron (optional)
+
+Add a Vercel Cron job (daily/hourly) that:
+
+- finds recent pending messages missing embedding / cluster
+- computes embeddings
+- assigns clusters
+
+This is still minimal (no external queue), and it protects us from transient embedding API issues.
+
+### Avoid for now
+
+- Dedicated queue systems (Upstash/QStash, custom workers) unless we need them.
+
+---
+
+## Moderation + public rendering rules
+
+### Core rule
+
+**Public only shows curated representatives**.
+
+That means:
+
+- A cluster must have a representative.
+- Representative must be **approved**.
+- Representative must have **curated/edited content** (e.g. `public_content` or existing `edited_content`).
+- All non-representative members should never be shown publicly.
+
+### Admin workflow (initial)
+
+- Admin queue shows clusters.
+- Admin can edit the representative’s public content.
+- Approve/deny cluster:
+  - Approve:
+    - set representative `approved`
+    - set other members `denied` as duplicates (or keep pending but hidden; decide in implementation)
+  - Deny:
+    - deny all members
+
+---
+
+## Milestones / tasks (working checklist)
+
+### M1 — DB + pgvector foundations
+
+- [ ] Enable pgvector extension in Supabase
+- [ ] Add migrations for:
+  - [ ] `message_clusters`
+  - [ ] `message_cluster_members`
+  - [ ] `message_embeddings` (vector column + index)
+  - [ ] `messages.normalized_hash` + `messages.normalized_content` (optional)
+  - [ ] `messages.cluster_id`
+  - [ ] `messages.public_content` (or clarify `edited_content` semantics)
+- [ ] Add indexes:
+  - [ ] normalized hash lookup
+  - [ ] vector index (ivfflat/hnsw) depending on Supabase support
+
+### M2 — Synchronous ingestion clustering (Option A)
+
+- [ ] Implement normalization + hash
+- [ ] Implement embedding generation
+- [ ] Implement pgvector nearest-neighbor query
+- [ ] Assign cluster + representative
+- [ ] Store embedding + model
+- [ ] Add safeguards:
+  - [ ] timeouts
+  - [ ] fail-open (insert message even if embedding fails)
+
+### M3 — Admin: cluster moderation MVP
+
+- [ ] Admin list: clusters view (representative + count + strategy)
+- [ ] Cluster detail: representative + member list
+- [ ] Approve/deny cluster applies to members
+- [ ] Representative editing UI (public content)
+
+### M4 — Public site: only curated representatives
+
+- [ ] Update public queries to select only:
+  - approved representatives
+  - with `public_content` (or `edited_content`) not null
+- [ ] Update message detail route to resolve representatives only
+- [ ] Ensure cacheability:
+  - ISR revalidate
+  - `unstable_cache` around representative queries
+
+### M5 — Backfill + ops (optional but recommended)
+
+- [ ] Vercel Cron: backfill embeddings/clusters for messages missing them
+- [ ] Basic observability: log rate + failures for embedding calls
 
 ---
 
 ## Risks / tradeoffs
 
-- False positives (incorrectly grouping distinct confessions) → mitigated by conservative thresholds + admin split.
-- Cost of embeddings/LLM adjudication → mitigated by staged pipeline and caps.
-- UX complexity → mitigated by phased rollout.
-
----
-
-## Open questions
-
-- Do we want the public site to show _only_ representatives, or also show duplicates but collapsed?
-- What is the expected ingest volume (to size batch jobs/indexes)?
-- Which embedding provider/model should we use (OpenAI, local, etc.)?
-- How should “duplicate denied” be presented in admin audit logs?
+- **False positives** (grouping distinct confessions) → mitigate with conservative thresholds + admin override later.
+- **Serverless latency/cost** from synchronous embeddings → mitigate with small model + min-length threshold + cron backfill.
+- **Public quality bar** (only curated representatives) means fewer items show up until moderation catches up — acceptable.
