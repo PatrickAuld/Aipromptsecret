@@ -48,7 +48,11 @@ export default async function MessageDetailPage({
       {message.moderation_status !== "denied" && (
         <ModerationForm
           messageId={message.id}
-          defaultEditedContent={message.edited_content ?? message.content}
+          defaultEditedContent={
+            message.edited_content && message.edited_content.trim().length > 0
+              ? message.edited_content
+              : message.content
+          }
           canApprove={message.moderation_status === "pending"}
           canDeny
         />

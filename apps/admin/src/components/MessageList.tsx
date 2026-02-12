@@ -22,12 +22,16 @@ export function MessageList({
   const initialState = useMemo(() => {
     const map: Record<string, RowState> = {};
     for (const msg of messages) {
-      const edited =
+      const editedRaw =
         // message.edited_content exists on some branches; fall back to content.
-        ("edited_content" in msg &&
+        "edited_content" in msg &&
         typeof (msg as { edited_content?: unknown }).edited_content === "string"
           ? (msg as { edited_content: string }).edited_content
-          : null) ?? msg.content;
+          : null;
+
+      const edited =
+        editedRaw && editedRaw.trim().length > 0 ? editedRaw : msg.content;
+
       map[msg.id] = {
         editedContent: edited,
         status: "idle",
@@ -121,7 +125,14 @@ export function MessageList({
         <tbody>
           {messages.map((msg) => {
             const row = rows[msg.id] ?? {
-              editedContent: msg.content,
+              editedContent:
+                "edited_content" in msg &&
+                typeof (msg as { edited_content?: unknown }).edited_content ===
+                  "string" &&
+                (msg as { edited_content: string }).edited_content.trim()
+                  .length > 0
+                  ? (msg as { edited_content: string }).edited_content
+                  : msg.content,
               status: "idle" as const,
             };
             const isLoading = row.status === "loading";
