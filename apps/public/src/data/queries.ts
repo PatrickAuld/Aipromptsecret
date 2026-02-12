@@ -145,7 +145,7 @@ async function _getCurrentFeaturedSetWithMessages(
 
   const messages = (rows ?? [])
     .map((r) => (r as any).message as Message | null)
-    .filter((m): m is Message => Boolean(m) && Boolean(m.short_id));
+    .filter((m): m is Message => m !== null && m.short_id !== null);
 
   return { set, messages };
 }
