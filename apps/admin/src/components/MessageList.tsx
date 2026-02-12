@@ -2,6 +2,7 @@
 
 import type { Message } from "@nulldiary/db";
 import { useMemo, useState } from "react";
+import { FeaturedSetsPicker } from "@/components/FeaturedSetsPicker";
 
 type RowState = {
   editedContent: string;
@@ -9,7 +10,15 @@ type RowState = {
   error?: string;
 };
 
-export function MessageList({ messages }: { messages: Message[] }) {
+export function MessageList({
+  messages,
+  featuredSets,
+  featuredMemberships,
+}: {
+  messages: Message[];
+  featuredSets: import("@/data/featured").FeaturedSetRow[];
+  featuredMemberships: Record<string, string[]>;
+}) {
   const initialState = useMemo(() => {
     const map: Record<string, RowState> = {};
     for (const msg of messages) {
@@ -157,6 +166,20 @@ export function MessageList({ messages }: { messages: Message[] }) {
                       style={{ display: "flex", gap: "0.5rem", paddingTop: 8 }}
                     >
                       <a href={`/messages/${msg.id}`}>View</a>
+                      {msg.moderation_status === "approved" && (
+                        <details>
+                          <summary style={{ cursor: "pointer" }}>
+                            Featured
+                          </summary>
+                          <div style={{ paddingTop: 8 }}>
+                            <FeaturedSetsPicker
+                              messageId={msg.id}
+                              sets={featuredSets}
+                              selectedSetIds={featuredMemberships[msg.id] ?? []}
+                            />
+                          </div>
+                        </details>
+                      )}
                       <button
                         type="button"
                         disabled={isLoading}

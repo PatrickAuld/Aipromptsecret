@@ -3,6 +3,8 @@ import { getDb } from "@/lib/db";
 import { getMessageById, getIngestionEventsByMessageId } from "@/data/queries";
 import { MessageDetail } from "@/components/MessageDetail";
 import { ModerationForm } from "@/components/ModerationForm";
+import { listFeaturedMemberships, listFeaturedSets } from "@/data/featured";
+import { FeaturedSetsPicker } from "@/components/FeaturedSetsPicker";
 
 export default async function MessageDetailPage({
   params,
@@ -19,6 +21,10 @@ export default async function MessageDetailPage({
 
   const events = await getIngestionEventsByMessageId(db, id);
 
+  const featuredSets = await listFeaturedSets(db);
+  const memberships = await listFeaturedMemberships(db, [id]);
+  const selectedSetIds = memberships.map((m) => m.set_id);
+
   return (
     <div>
       <h1>Message Detail</h1>
@@ -27,6 +33,17 @@ export default async function MessageDetailPage({
       </p>
 
       <MessageDetail message={message} events={events} />
+
+      {message.moderation_status === "approved" && (
+        <div className="detail-section">
+          <h2>Featured sets</h2>
+          <FeaturedSetsPicker
+            messageId={message.id}
+            sets={featuredSets}
+            selectedSetIds={selectedSetIds}
+          />
+        </div>
+      )}
 
       {message.moderation_status !== "denied" && (
         <ModerationForm
