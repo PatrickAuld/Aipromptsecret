@@ -2,8 +2,15 @@
 
 import { useState } from "react";
 
-export function ModerationForm({ messageId }: { messageId: string }) {
+export function ModerationForm({
+  messageId,
+  defaultEditedContent,
+}: {
+  messageId: string;
+  defaultEditedContent: string;
+}) {
   const [reason, setReason] = useState("");
+  const [editedContent, setEditedContent] = useState(defaultEditedContent);
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
@@ -19,6 +26,9 @@ export function ModerationForm({ messageId }: { messageId: string }) {
       body: JSON.stringify({
         messageId,
         reason: reason.trim() || undefined,
+        ...(action === "approve"
+          ? { editedContent: editedContent.trim() || undefined }
+          : {}),
       }),
     });
 
@@ -35,6 +45,17 @@ export function ModerationForm({ messageId }: { messageId: string }) {
   return (
     <div className="detail-section">
       <h2>Moderate</h2>
+      <div style={{ marginBottom: "0.5rem" }}>
+        <label htmlFor="editedContent">Edited content</label>
+        <textarea
+          id="editedContent"
+          value={editedContent}
+          onChange={(e) => setEditedContent(e.target.value)}
+          placeholder="The version that will be shown publicly"
+          rows={6}
+        />
+      </div>
+
       <div style={{ marginBottom: "0.5rem" }}>
         <label htmlFor="reason">Reason (optional)</label>
         <textarea

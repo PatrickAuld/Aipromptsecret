@@ -17,7 +17,7 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   const body = await req.json();
-  const { messageId, reason } = body;
+  const { messageId, reason, editedContent } = body;
 
   if (!messageId || typeof messageId !== "string") {
     return NextResponse.json(
@@ -26,8 +26,20 @@ export async function POST(req: Request): Promise<Response> {
     );
   }
 
+  if (editedContent !== undefined && typeof editedContent !== "string") {
+    return NextResponse.json(
+      { error: "editedContent must be a string" },
+      { status: 400 },
+    );
+  }
+
   const actor = user.email || user.id;
-  const result = await approveMessage(getDb(), { messageId, actor, reason });
+  const result = await approveMessage(getDb(), {
+    messageId,
+    actor,
+    reason,
+    editedContent: editedContent?.trim() || undefined,
+  });
 
   if (!result.ok) {
     const status = result.error === "Message not found" ? 404 : 400;
