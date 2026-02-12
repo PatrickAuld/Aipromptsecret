@@ -15,9 +15,11 @@
     "dev:services": "./scripts/dev-services.sh",
     "dev:seed": "./scripts/seed.sh",
     "dev:down": "./scripts/dev-down.sh",
-    "dev:reset": "./scripts/dev-reset.sh"
+    "dev:reset": "./scripts/dev-reset.sh",
+    "e2e": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "prettier": "^3.8.0",
     "eslint": "^9.39.0",
     "@eslint/js": "^9.39.0",

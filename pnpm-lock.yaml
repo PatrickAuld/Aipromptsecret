@@ -10,6 +10,9 @@ importers:
       "@eslint/js":
         specifier: ^9.39.0
         version: 9.39.2
+      "@playwright/test":
+        specifier: ^1.55.0
+        version: 1.58.2
       eslint:
         specifier: ^9.39.0
         version: 9.39.2
@@ -33,7 +36,7 @@ importers:
         version: 2.95.3
       next:
         specifier: ^15.5.0
-        version: 15.5.11(react-dom@19.2.4)(react@19.2.4)
+        version: 15.5.11(@playwright/test@1.58.2)(react-dom@19.2.4)(react@19.2.4)
       react:
         specifier: ^19.2.0
         version: 19.2.4
@@ -70,7 +73,7 @@ importers:
         version: link:../../packages/ingestion
       next:
         specifier: ^15.5.0
-        version: 15.5.11(react-dom@19.2.4)(react@19.2.4)
+        version: 15.5.11(@playwright/test@1.58.2)(react-dom@19.2.4)(react@19.2.4)
       react:
         specifier: ^19.2.0
         version: 19.2.4
@@ -1617,6 +1620,16 @@ packages:
     dev: false
     optional: true
 
+  /@playwright/test@1.58.2:
+    resolution:
+      {
+        integrity: sha512-akea+6bHYBBfA9uQqSYmlJXn61cTa+jbO87xVLCWbTqbWadRVmhxlXATaOjOgcBaWU4ePo0wB41KMFv3o35IXA==,
+      }
+    engines: { node: ">=18" }
+    hasBin: true
+    dependencies:
+      playwright: 1.58.2
+
   /@rollup/rollup-android-arm-eabi@4.57.1:
     resolution:
       {
@@ -3003,6 +3016,16 @@ packages:
       }
     dev: true
 
+  /fsevents@2.3.2:
+    resolution:
+      {
+        integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==,
+      }
+    engines: { node: ^8.16.0 || ^10.6.0 || >=11.0.0 }
+    os: [darwin]
+    requiresBuild: true
+    optional: true
+
   /fsevents@2.3.3:
     resolution:
       {
@@ -3235,7 +3258,7 @@ packages:
       }
     dev: true
 
-  /next@15.5.11(react-dom@19.2.4)(react@19.2.4):
+  /next@15.5.11(@playwright/test@1.58.2)(react-dom@19.2.4)(react@19.2.4):
     resolution:
       {
         integrity: sha512-L2KPiKmqTDpRdeVDdPjhf43g2/VPe0NCNndq7OKDCgOLWtxe1kbr/zXGIZtYY7kZEAjRf7Bj/mwUFSr+tYC2Yg==,
@@ -3260,6 +3283,7 @@ packages:
         optional: true
     dependencies:
       "@next/env": 15.5.11
+      "@playwright/test": 1.58.2
       "@swc/helpers": 0.5.15
       caniuse-lite: 1.0.30001767
       postcss: 8.4.31
@@ -3369,6 +3393,26 @@ packages:
       }
     engines: { node: ">=12" }
     dev: true
+
+  /playwright-core@1.58.2:
+    resolution:
+      {
+        integrity: sha512-yZkEtftgwS8CsfYo7nm0KE8jsvm6i/PTgVtB8DL726wNf6H2IMsDuxCpJj59KDaxCtSnrWan2AeDqM7JBaultg==,
+      }
+    engines: { node: ">=18" }
+    hasBin: true
+
+  /playwright@1.58.2:
+    resolution:
+      {
+        integrity: sha512-vA30H8Nvkq/cPBnNw4Q8TWz1EJyqgpuinBcHET0YVJVFldr8JDNiU9LaWAE1KqSkRYazuaBhTpB5ZzShOezQ6A==,
+      }
+    engines: { node: ">=18" }
+    hasBin: true
+    dependencies:
+      playwright-core: 1.58.2
+    optionalDependencies:
+      fsevents: 2.3.2
 
   /postcss@8.4.31:
     resolution:
