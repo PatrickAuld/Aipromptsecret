@@ -30,16 +30,32 @@ export default async function HomePage() {
 
   return (
     <>
-      {featured.messages.map((msg) => (
-        <a
-          key={msg.id}
-          href={`/messages/${msg.id}`}
-          className="secret-item"
-          data-size={secretSize(msg.edited_content ?? msg.content)}
-        >
-          <p className="secret-text">{msg.edited_content ?? msg.content}</p>
-        </a>
-      ))}
+      {featured.messages.map((msg, i) => {
+        const createdLabel = msg.approved_at
+          ? new Date(msg.approved_at).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })
+          : "";
+
+        return (
+          <a
+            key={msg.id}
+            href={`/messages/${msg.id}`}
+            className="secret-item"
+            data-size={secretSize(msg.edited_content ?? msg.content)}
+          >
+            <p className="secret-text">{msg.edited_content ?? msg.content}</p>
+            <div className="secret-meta">
+              <span className="secret-number">
+                No. {String(featured.messages.length - i).padStart(3, "0")}
+              </span>
+              {createdLabel && <time>{createdLabel}</time>}
+            </div>
+          </a>
+        );
+      })}
     </>
   );
 }
