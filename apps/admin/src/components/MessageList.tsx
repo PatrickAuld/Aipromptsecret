@@ -34,7 +34,7 @@ export function MessageList({ messages }: { messages: Message[] }) {
   }
 
   async function moderate(
-    action: "approve" | "deny",
+    action: "approve" | "deny" | "edit",
     messageId: string,
   ): Promise<void> {
     setRows((prev) => ({
@@ -43,15 +43,23 @@ export function MessageList({ messages }: { messages: Message[] }) {
     }));
 
     try {
-      const payload: { messageId: string; editedContent?: string } = {
+      const payload: { messageId: string; editedContent?: string | null } = {
         messageId,
       };
+
       if (action === "approve") {
         payload.editedContent =
           rows[messageId]?.editedContent?.trim() || undefined;
       }
 
-      const res = await fetch(`/api/moderation/${action}`, {
+      if (action === "edit") {
+        payload.editedContent = rows[messageId]?.editedContent?.trim() || null;
+      }
+
+      const endpoint =
+        action === "edit" ? "/api/messages/edit" : `/api/moderation/${action}`;
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -149,6 +157,13 @@ export function MessageList({ messages }: { messages: Message[] }) {
                       style={{ display: "flex", gap: "0.5rem", paddingTop: 8 }}
                     >
                       <a href={`/messages/${msg.id}`}>View</a>
+                      <button
+                        type="button"
+                        disabled={isLoading}
+                        onClick={() => moderate("edit", msg.id)}
+                      >
+                        Save edit
+                      </button>
                       <button
                         type="button"
                         disabled={isLoading}

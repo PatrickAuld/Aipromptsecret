@@ -20,20 +20,27 @@ export function ModerationForm({
   >("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
-  async function handleAction(action: "approve" | "deny") {
+  async function handleAction(action: "approve" | "deny" | "edit") {
     setStatus("loading");
     setErrorMessage("");
 
     try {
-      const res = await fetch(`/api/moderation/${action}`, {
+      const endpoint =
+        action === "edit" ? "/api/messages/edit" : `/api/moderation/${action}`;
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messageId,
-          reason: reason.trim() || undefined,
           ...(action === "approve"
-            ? { editedContent: editedContent.trim() || undefined }
-            : {}),
+            ? {
+                reason: reason.trim() || undefined,
+                editedContent: editedContent.trim() || undefined,
+              }
+            : action === "deny"
+              ? { reason: reason.trim() || undefined }
+              : { editedContent: editedContent.trim() || null }),
         }),
       });
 
@@ -84,6 +91,13 @@ export function ModerationForm({
         />
       </div>
       <div className="actions">
+        <button
+          data-action="edit"
+          disabled={status === "loading"}
+          onClick={() => handleAction("edit")}
+        >
+          Save edit
+        </button>
         {(canApprove ?? true) && (
           <button
             data-action="approve"
