@@ -39,9 +39,9 @@ export function ModerationForm({
         return;
       }
 
-      let body: any = null;
+      let body: { error?: string } | null = null;
       try {
-        body = await res.json();
+        body = (await res.json()) as { error?: string };
       } catch {
         // If the server returns HTML/plaintext, avoid leaving the UI stuck.
       }
