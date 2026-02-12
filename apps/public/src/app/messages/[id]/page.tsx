@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getApprovedMessageByIdCached } from "@/data/queries";
 
-export const revalidate = 60;
+export const revalidate = 600;
 
 export default async function MessagePage({
   params,

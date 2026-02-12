@@ -2,7 +2,7 @@ import type { Db, Message } from "@nulldiary/db";
 import { unstable_cache } from "next/cache";
 import { getDb } from "@/lib/db";
 
-const PUBLIC_REVALIDATE_SECONDS = 60;
+const PUBLIC_REVALIDATE_SECONDS = 600;
 
 async function _getApprovedMessages(
   db: Db,

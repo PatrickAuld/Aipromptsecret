@@ -1,6 +1,6 @@
 import { getApprovedMessagesCached } from "@/data/queries";
 
-export const revalidate = 60;
+export const revalidate = 600;
 
 const PAGE_SIZE = 50;
 
