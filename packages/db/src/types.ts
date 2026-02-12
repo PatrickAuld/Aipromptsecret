@@ -53,3 +53,10 @@ export interface FeaturedSetMessage {
   position: number;
   created_at: string;
 }
+
+export interface AdminUser {
+  id: string;
+  user_id: string;
+  email: string | null;
+  created_at: string;
+}
