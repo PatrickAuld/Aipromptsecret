@@ -22,7 +22,7 @@ export function UserNav() {
   if (!email) return null;
 
   return (
-    <span style={{ float: "right" }}>
+    <span className="user-nav">
       {email} <LogoutButton />
     </span>
   );

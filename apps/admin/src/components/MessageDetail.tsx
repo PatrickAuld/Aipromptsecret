@@ -38,12 +38,12 @@ export function MessageDetail({
           </p>
         )}
 
-        <h3 style={{ marginTop: "1rem" }}>What will be shown</h3>
+        <h3 className="detail-section__subtitle">What will be shown</h3>
         <pre>{publicContent}</pre>
 
-        <details style={{ marginTop: "0.75rem" }}>
-          <summary style={{ cursor: "pointer" }}>Original message</summary>
-          <pre style={{ marginTop: "0.5rem" }}>{message.content}</pre>
+        <details>
+          <summary>Original message</summary>
+          <pre>{message.content}</pre>
         </details>
       </div>
 
@@ -53,7 +53,7 @@ export function MessageDetail({
           <p>No ingestion events found.</p>
         ) : (
           events.map((evt) => (
-            <details key={evt.id} style={{ marginBottom: "0.5rem" }}>
+            <details key={evt.id}>
               <summary>
                 {evt.method} {evt.path} —{" "}
                 {new Date(evt.received_at).toLocaleString()}

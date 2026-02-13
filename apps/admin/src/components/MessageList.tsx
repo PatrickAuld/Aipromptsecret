@@ -213,7 +213,7 @@ export function MessageList({
 
             <details className="message-card__edit">
               <summary>Edit what will be shown</summary>
-              <div style={{ marginTop: 8 }}>
+              <div className="message-card__edit-body">
                 <textarea
                   value={row.editedContent}
                   onChange={(e) =>
@@ -228,7 +228,7 @@ export function MessageList({
                   rows={5}
                   placeholder="The version that will be shown publicly"
                 />
-                <div className="message-card__actions" style={{ marginTop: 8 }}>
+                <div className="message-card__actions">
                   <button
                     type="button"
                     disabled={isLoading}
@@ -243,7 +243,7 @@ export function MessageList({
             {msg.moderation_status === "approved" ? (
               <details className="message-card__featured">
                 <summary>Featured sets</summary>
-                <div style={{ marginTop: 8 }}>
+                <div className="message-card__edit-body">
                   <FeaturedSetsPicker
                     messageId={msg.id}
                     sets={featuredSets}

@@ -7,10 +7,10 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
   const [state, formAction, pending] = useActionState(login, { error: "" });
 
   return (
-    <form action={formAction}>
+    <form className="login-form" action={formAction}>
       <h1>Admin Login</h1>
       <input type="hidden" name="redirectTo" value={redirectTo} />
-      <div style={{ marginBottom: "0.5rem" }}>
+      <div className="form-group">
         <label htmlFor="email">Email</label>
         <input
           id="email"
@@ -18,10 +18,9 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
           type="email"
           required
           autoComplete="email"
-          style={{ width: "20rem" }}
         />
       </div>
-      <div style={{ marginBottom: "0.5rem" }}>
+      <div className="form-group">
         <label htmlFor="password">Password</label>
         <input
           id="password"
@@ -29,7 +28,6 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
           type="password"
           required
           autoComplete="current-password"
-          style={{ width: "20rem" }}
         />
       </div>
       <button type="submit" disabled={pending}>

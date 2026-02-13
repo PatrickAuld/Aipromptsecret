@@ -60,7 +60,7 @@ export default async function MessagesPage({
         before={sp.before ?? ""}
       />
 
-      <p>
+      <p className="count-text">
         Showing {messages.length} of {total} messages
         {offset > 0 && ` (offset ${offset})`}
       </p>
@@ -72,7 +72,7 @@ export default async function MessagesPage({
       />
 
       {total > offset + limit && (
-        <p style={{ marginTop: "1rem" }}>
+        <p className="pagination">
           <a
             href={`/messages?status=${status}&offset=${offset + limit}&limit=${limit}${search ? `&search=${search}` : ""}`}
           >

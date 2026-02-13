@@ -99,18 +99,14 @@ export default async function DenylistPage({
         <code>/128</code>) or CIDR ranges.
       </p>
 
-      {error && (
-        <p className="error" style={{ marginTop: 12 }}>
-          {error}
-        </p>
-      )}
+      {error && <p className="error">{error}</p>}
       {added && (
-        <p className="success" style={{ marginTop: 12 }}>
+        <p className="success">
           Added <code>{added}</code>
         </p>
       )}
       {removed && (
-        <p className="success" style={{ marginTop: 12 }}>
+        <p className="success">
           Removed <code>{removed}</code>
         </p>
       )}

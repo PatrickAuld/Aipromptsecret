@@ -51,9 +51,9 @@ export function FeaturedSetsPicker({
 
   return (
     <div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <div className="featured-picker">
         {sets.map((s) => (
-          <label key={s.id} style={{ display: "flex", gap: 8 }}>
+          <label key={s.id} className="featured-picker__item">
             <input
               type="checkbox"
               checked={selected.has(s.id)}
@@ -68,9 +68,7 @@ export function FeaturedSetsPicker({
         ))}
       </div>
       {status === "error" && (
-        <p className="error" style={{ marginTop: 8 }}>
-          Failed to update featured membership.
-        </p>
+        <p className="error">Failed to update featured membership.</p>
       )}
     </div>
   );
