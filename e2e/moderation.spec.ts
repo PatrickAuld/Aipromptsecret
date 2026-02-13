@@ -2,18 +2,22 @@ import { test, expect } from "@playwright/test";
 import { uuidv7 } from "uuidv7";
 import { createDb } from "@nulldiary/db";
 
-function requireEnv(name: string): string {
+function getOptionalEnv(name: string): string | null {
   const v = process.env[name];
-  if (!v) {
-    throw new Error(`Missing required env var: ${name}`);
-  }
-  return v;
+  return v && v.trim().length > 0 ? v : null;
 }
 
 function getDb() {
   // NOTE: Use service role for tests. Do NOT run these against production.
-  const url = requireEnv("SUPABASE_URL");
-  const key = requireEnv("SUPABASE_SERVICE_ROLE_KEY");
+  const url = getOptionalEnv("SUPABASE_URL");
+  const key = getOptionalEnv("SUPABASE_SERVICE_ROLE_KEY");
+
+  if (!url || !key) {
+    throw new Error(
+      "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY (required for e2e).",
+    );
+  }
+
   return createDb(url, key);
 }
 
@@ -63,7 +67,13 @@ async function denyMessage(db: ReturnType<typeof getDb>, id: string) {
   if (actionError) throw actionError;
 }
 
+const hasE2eEnv =
+  !!process.env.SUPABASE_URL && !!process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+test.describe.configure({ mode: "serial" });
+
 test.describe("moderation flow (db-backed)", () => {
+  test.skip(!hasE2eEnv, "Missing SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY");
   test("adds and approves a message", async () => {
     const db = getDb();
 
