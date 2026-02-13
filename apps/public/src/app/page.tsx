@@ -8,6 +8,14 @@ function secretSize(content: string): "large" | "medium" | "small" {
   return "small";
 }
 
+function formatApprovedAt(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export default async function HomePage() {
   let featured: Awaited<
     ReturnType<typeof getCurrentFeaturedSetWithMessagesCached>
@@ -32,17 +40,17 @@ export default async function HomePage() {
     <>
       {featured.messages.map((msg, i) => {
         const createdLabel = msg.approved_at
-          ? new Date(msg.approved_at).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })
+          ? formatApprovedAt(msg.approved_at)
           : "";
+
+        const href = msg.short_id
+          ? `/m/${msg.short_id}`
+          : `/messages/${msg.id}`;
 
         return (
           <a
             key={msg.id}
-            href={`/messages/${msg.id}`}
+            href={href}
             className="secret-item"
             data-size={secretSize(msg.edited_content ?? msg.content)}
           >

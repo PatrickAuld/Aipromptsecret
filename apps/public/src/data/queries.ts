@@ -20,6 +20,7 @@ async function _getApprovedMessages(
     .from("messages")
     .select("*")
     .eq("moderation_status", "approved")
+    .not("short_id", "is", null)
     .order("approved_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -28,7 +29,8 @@ async function _getApprovedMessages(
   const { count, error: countError } = await db
     .from("messages")
     .select("*", { count: "exact", head: true })
-    .eq("moderation_status", "approved");
+    .eq("moderation_status", "approved")
+    .not("short_id", "is", null);
 
   if (countError) throw countError;
 
@@ -43,6 +45,23 @@ async function _getApprovedMessageById(
     .from("messages")
     .select("*")
     .eq("id", id)
+    .eq("moderation_status", "approved")
+    .single();
+
+  if (error && error.code === "PGRST116") return null;
+  if (error) throw error;
+
+  return data as Message;
+}
+
+async function _getApprovedMessageByShortId(
+  db: Db,
+  shortId: string,
+): Promise<Message | null> {
+  const { data, error } = await db
+    .from("messages")
+    .select("*")
+    .eq("short_id", shortId)
     .eq("moderation_status", "approved")
     .single();
 
@@ -92,6 +111,14 @@ export const getApprovedMessageByIdCached = unstable_cache(
   { revalidate: PUBLIC_REVALIDATE_SECONDS },
 );
 
+export const getApprovedMessageByShortIdCached = unstable_cache(
+  async (shortId: string) => {
+    return _getApprovedMessageByShortId(getDb(), shortId);
+  },
+  ["public:getApprovedMessageByShortId"],
+  { revalidate: PUBLIC_REVALIDATE_SECONDS },
+);
+
 async function _getCurrentFeaturedSetWithMessages(
   db: Db,
 ): Promise<FeaturedSetWithMessages | null> {
@@ -115,7 +142,7 @@ async function _getCurrentFeaturedSetWithMessages(
 
   const messages = (rows ?? [])
     .map((r) => (r as any).message as Message | null)
-    .filter((m): m is Message => Boolean(m));
+    .filter((m): m is Message => m !== null && m.short_id !== null);
 
   return { set, messages };
 }
