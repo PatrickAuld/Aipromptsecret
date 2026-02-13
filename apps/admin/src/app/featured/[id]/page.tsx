@@ -99,7 +99,9 @@ export default async function FeaturedSetDetailPage({
     <div>
       <h1>Featured set</h1>
       <p>
-        <a href="/featured">&larr; Back</a>
+        <a className="back-link" href="/featured">
+          &larr; Back
+        </a>
       </p>
 
       <div className="detail-section">
@@ -117,7 +119,7 @@ export default async function FeaturedSetDetailPage({
         </p>
 
         {!set.pinned && (
-          <form action={pinSet} style={{ marginBottom: "1rem" }}>
+          <form action={pinSet}>
             <button type="submit">Pin to homepage</button>
           </form>
         )}

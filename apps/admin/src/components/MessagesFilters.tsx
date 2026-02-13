@@ -12,6 +12,8 @@ type Props = {
   before: string;
 };
 
+const statuses: Status[] = ["pending", "approved", "denied"];
+
 function buildQuery(params: {
   status: Status;
   search: string;
@@ -87,77 +89,80 @@ export function MessagesFilters(props: Props) {
   }, [pathname, searchParams]);
 
   return (
-    <form className="filters" onSubmit={(e) => e.preventDefault()}>
-      <div>
-        <label htmlFor="status">Status</label>
-        <select
-          id="status"
-          name="status"
-          value={status}
-          onChange={(e) => {
-            const next = e.target.value as Status;
-            setStatus(next);
-            pushNext({ status: next, search, after, before });
-          }}
-        >
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="denied">Denied</option>
-        </select>
+    <div>
+      <div className="status-tabs">
+        {statuses.map((s) => (
+          <button
+            key={s}
+            type="button"
+            className={`status-tabs__btn${s === status ? " status-tabs__btn--active" : ""}`}
+            onClick={() => {
+              setStatus(s);
+              pushNext({ status: s, search, after, before });
+            }}
+          >
+            {s.charAt(0).toUpperCase() + s.slice(1)}
+          </button>
+        ))}
       </div>
 
-      <div>
-        <label htmlFor="search">Search</label>
-        <input
-          id="search"
-          name="search"
-          type="text"
-          value={search}
-          placeholder="Search content..."
-          onChange={(e) => {
-            const next = e.target.value;
-            setSearch(next);
+      <details className="filters-panel">
+        <summary>Filters</summary>
+        <form className="filters" onSubmit={(e) => e.preventDefault()}>
+          <div>
+            <label htmlFor="search">Search</label>
+            <input
+              id="search"
+              name="search"
+              type="text"
+              value={search}
+              placeholder="Search content..."
+              onChange={(e) => {
+                const next = e.target.value;
+                setSearch(next);
 
-            if (searchDebounceRef.current) {
-              window.clearTimeout(searchDebounceRef.current);
-            }
+                if (searchDebounceRef.current) {
+                  window.clearTimeout(searchDebounceRef.current);
+                }
 
-            searchDebounceRef.current = window.setTimeout(() => {
-              pushNext({ status, search: next, after, before });
-            }, 250);
-          }}
-        />
-      </div>
+                searchDebounceRef.current = window.setTimeout(() => {
+                  pushNext({ status, search: next, after, before });
+                }, 250);
+              }}
+            />
+          </div>
 
-      <div>
-        <label htmlFor="after">After</label>
-        <input
-          id="after"
-          name="after"
-          type="date"
-          value={after}
-          onChange={(e) => {
-            const next = e.target.value;
-            setAfter(next);
-            pushNext({ status, search, after: next, before });
-          }}
-        />
-      </div>
+          <div>
+            <label htmlFor="after">After</label>
+            <input
+              id="after"
+              name="after"
+              type="date"
+              value={after}
+              onChange={(e) => {
+                const next = e.target.value;
+                setAfter(next);
+                pushNext({ status, search, after: next, before });
+              }}
+            />
+          </div>
 
-      <div>
-        <label htmlFor="before">Before</label>
-        <input
-          id="before"
-          name="before"
-          type="date"
-          value={before}
-          onChange={(e) => {
-            const next = e.target.value;
-            setBefore(next);
-            pushNext({ status, search, after, before: next });
-          }}
-        />
-      </div>
-    </form>
+          <div>
+            <label htmlFor="before">Before</label>
+            <input
+              id="before"
+              name="before"
+              type="date"
+              value={before}
+              onChange={(e) => {
+                const next = e.target.value;
+                setBefore(next);
+                pushNext({ status, search, after, before: next });
+              }}
+            />
+          </div>
+        </form>
+      </details>
+    </div>
   );
 }

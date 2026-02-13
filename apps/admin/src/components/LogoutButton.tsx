@@ -11,5 +11,9 @@ export function LogoutButton() {
     window.location.href = "/login";
   }
 
-  return <button onClick={handleLogout}>Sign out</button>;
+  return (
+    <button className="btn-ghost" onClick={handleLogout}>
+      Sign out
+    </button>
+  );
 }

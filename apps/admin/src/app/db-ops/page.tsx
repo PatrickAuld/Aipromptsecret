@@ -87,7 +87,7 @@ export default async function DbOpsPage({
         </div>
       )}
 
-      <div className="detail-section">
+      <div className="detail-section danger-zone">
         <h2>Delete messages by status older than N days</h2>
         <form action={deleteOldMessages}>
           <div className="filters">
@@ -113,7 +113,7 @@ export default async function DbOpsPage({
           </div>
         </form>
 
-        <p style={{ marginTop: 12 }}>
+        <p>
           Tip: start with <code>pending</code> and a high day count (e.g. 90).
         </p>
       </div>

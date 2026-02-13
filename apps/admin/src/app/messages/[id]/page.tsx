@@ -29,7 +29,9 @@ export default async function MessageDetailPage({
     <div>
       <h1>Message Detail</h1>
       <p>
-        <a href="/messages">&larr; Back to list</a>
+        <a className="back-link" href="/messages">
+          &larr; Back to list
+        </a>
       </p>
 
       <MessageDetail message={message} events={events} />

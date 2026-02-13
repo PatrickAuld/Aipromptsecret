@@ -8,7 +8,7 @@ export default async function LoginPage({
   const { redirectTo = "/messages" } = await searchParams;
 
   return (
-    <div style={{ maxWidth: "30rem", margin: "2rem auto" }}>
+    <div className="login-page">
       <LoginForm redirectTo={redirectTo} />
     </div>
   );
