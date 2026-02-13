@@ -50,6 +50,35 @@ export async function approveMessage(
   return { ok: true };
 }
 
+export async function updateEditedContent(
+  db: Db,
+  input: { messageId: string; actor: string; editedContent: string | null },
+): Promise<ModerationResult> {
+  const { data: message, error: selectError } = await db
+    .from("messages")
+    .select("id")
+    .eq("id", input.messageId)
+    .single();
+
+  if (selectError && selectError.code === "PGRST116") {
+    return { ok: false, error: "Message not found" };
+  }
+  if (selectError) throw selectError;
+  if (!message) return { ok: false, error: "Message not found" };
+
+  const { error: updateError } = await db
+    .from("messages")
+    .update({
+      edited_content: input.editedContent,
+      moderated_by: input.actor,
+    })
+    .eq("id", input.messageId);
+
+  if (updateError) throw updateError;
+
+  return { ok: true };
+}
+
 export async function denyMessage(
   db: Db,
   input: ModerationInput,

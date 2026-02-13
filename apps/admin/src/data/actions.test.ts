@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { approveMessage, denyMessage } from "./actions.js";
+import { approveMessage, denyMessage, updateEditedContent } from "./actions.js";
 
 const { mockUuidv7 } = vi.hoisted(() => ({
   mockUuidv7: vi.fn(),
@@ -163,6 +163,53 @@ describe("approveMessage", () => {
       unknown
     >;
     expect(insertValues.reason).toBeNull();
+  });
+});
+
+describe("updateEditedContent", () => {
+  it("updates edited_content without changing moderation status", async () => {
+    const db = makeFakeDb();
+    db.setSelectResult({ id: "msg-9" });
+
+    const result = await updateEditedContent(db as never, {
+      messageId: "msg-9",
+      actor: "admin@test.com",
+      editedContent: "edited",
+    });
+
+    expect(result).toEqual({ ok: true });
+
+    const updateOp = db.ops.find((op) => op.op === "update");
+    expect(updateOp).toBeTruthy();
+    const updateValues = (updateOp?.args as unknown[])?.[0] as Record<
+      string,
+      unknown
+    >;
+
+    expect(updateValues).toMatchObject({
+      edited_content: "edited",
+      moderated_by: "admin@test.com",
+    });
+    // Should not set moderation_status.
+    expect(updateValues.moderation_status).toBeUndefined();
+  });
+
+  it("returns not found when message missing", async () => {
+    const db = makeFakeDb();
+    db.setSelectResult(null, {
+      code: "PGRST116",
+      message: "not found",
+      details: "",
+      hint: "",
+    });
+
+    const result = await updateEditedContent(db as never, {
+      messageId: "missing",
+      actor: "admin@test.com",
+      editedContent: "x",
+    });
+
+    expect(result).toEqual({ ok: false, error: "Message not found" });
   });
 });
 
