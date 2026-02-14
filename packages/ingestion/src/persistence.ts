@@ -19,8 +19,14 @@ export async function persistIngestion(
 
     // Generate a short, shareable ID for public URLs.
     // Retry a few times on the extremely unlikely chance of collision.
+    //
+    // NOTE: We also support older DBs where the short_id migration hasn't been
+    // applied yet. In that case PostgREST returns PGRST204 (schema cache doesn't
+    // include the column). We fall back to inserting without short_id so /s
+    // doesn't 500.
     let inserted = false;
     for (let attempt = 0; attempt < 5; attempt++) {
+      const shortId = randomShortId();
       const { error } = await db.from("messages").insert({
         id: messageId,
         content: parsed.message,
@@ -28,15 +34,33 @@ export async function persistIngestion(
         content_hash: contentHash,
         metadata: {},
         moderation_status: "pending",
-        short_id: randomShortId(),
+        short_id: shortId,
       });
 
       if (!error) {
         inserted = true;
         break;
       }
-      // Postgres unique violation
+
+      // PostgREST unknown column / schema cache mismatch (older DB).
+      if ((error as any).code === "PGRST204") {
+        const { error: fallbackError } = await db.from("messages").insert({
+          id: messageId,
+          content: parsed.message,
+          normalized_content: normalized,
+          content_hash: contentHash,
+          metadata: {},
+          moderation_status: "pending",
+        });
+
+        if (fallbackError) throw fallbackError;
+        inserted = true;
+        break;
+      }
+
+      // Postgres unique violation (short_id collision)
       if ((error as any).code === "23505") continue;
+
       throw error;
     }
 
